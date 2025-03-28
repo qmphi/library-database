@@ -4,11 +4,12 @@ def main_menu():
 To navigate, please use the following instructions:
 
   1 - Browse items
-  2 - Log in (for staff, volunteers, and users)
-  3 - View library events
-  4 - Donate an item
-  5 - Apply for volunteering
-  6 - Help
+  2 - To borrow an item
+  3 - To return an item
+  4 - View library events
+  5 - Donate an item
+  6 - Apply for volunteering
+  7 - Help
   0 - Exit the program
     """
     print(menu)
@@ -24,24 +25,20 @@ while (userInput != 0):
         #--> can search by different filters
         #searchFunc
         continue
-    elif (userInput == 2): #Log in (for staff, volunteers, and users)
-        # view my books 
-        # return book
-        # can continue browsing, just can't borrow
+    elif (userInput == 2): #borrow an item
         continue
-    elif (userInput == 3): #View library events
+    elif (userInput == 3): #return an item
+        continue
+    elif (userInput == 4): #View library events
         #View events --> can filter by audience, type, time, etc
         # register for event
         continue
-    elif (userInput == 4): #Donate an item
+    elif (userInput == 5): #Donate an item
         continue
-
-    elif (userInput == 5): # Apply for volunteering
+    elif (userInput == 6): # Apply for volunteering
         continue
-
-    elif (userInput == 6): #Help
+    elif (userInput == 7): #Help
         continue
-
     elif (userInput == 0): #Exit program
         break
     else:
