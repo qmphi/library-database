@@ -20,29 +20,29 @@ while (userInput != 0):
 
     main_menu()
     userInput = int(input("I want to navigate to: "))
-    if (userInput == 1):
+    if (userInput == 1): #Browse items
         #--> can search by different filters
         #searchFunc
         continue
-    elif (userInput == 2):
+    elif (userInput == 2): #Log in (for staff, volunteers, and users)
         # view my books 
         # return book
         # can continue browsing, just can't borrow
         continue
-    elif (userInput == 3):
+    elif (userInput == 3): #View library events
         #View events --> can filter by audience, type, time, etc
         # register for event
         continue
-    elif (userInput == 4):
+    elif (userInput == 4): #Donate an item
         continue
 
-    elif (userInput == 5):
+    elif (userInput == 5): # Apply for volunteering
         continue
 
-    elif (userInput == 6):
+    elif (userInput == 6): #Help
         continue
 
-    elif (userInput == 0):
+    elif (userInput == 0): #Exit program
         break
     else:
         print("Invalid menu code, please try again")
