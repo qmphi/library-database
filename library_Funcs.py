@@ -83,15 +83,39 @@ def borrowItem(itemID, userID):
     params = itemID
     item = databaseConnector(database, query, params, 0)
     if item:
+        #add new borrowedBy entry
         borrowDate = datetime.today().strftime('%Y-%m-%d')
         dueDate = (datetime.today() + timedelta(days=14)).strftime('%Y-%m-%d')
         insertQuery = "INSERT INTO borrowedBy (itemID, userID, borrowDate, dueDate, returnDate) VALUES (?, ?, ?, ?, NULL)"
         insertParams = [itemID,userID,borrowDate, dueDate, "NULL"]
         databaseConnector(database, insertQuery, insertParams, 1)
+
+        #update item isAvailable status
+        updateQuery = "UPDATE item SET isAvailable = 0 WHERE itemID = ?"
+        updateParam = itemID
+        databaseConnector(database, updateQuery, updateParam, 1)
+
         print(f"\nYou borrowed '{item[0]}`. Please return it by {dueDate}.")
     else:
         print("Item is not available for borrowing")
 
-# def returnItem(itemID, userID):
-    
+def returnItem(itemID, userID):
+    query = "SELECT title FROM item WHERE isAvailable = 0 AND itemID = ?"
+    params = itemID
+    item = databaseConnector(database, query, params, 0)
+    if item:
+        #update borrowedBy table
+        returnDate = datetime.today().strftime('%Y-%m-%d')
+        insertQuery = "UPDATE borrowedBy SET returnDate ? WHERE itemID = ? AND userID = ?"
+        insertParams = [returnDate, item, userID]
+        databaseConnector(database, insertQuery, insertParams, 1)
+
+        #update in item table, set isAvailable to 1
+        updateReturnedQuery = "UPDATE item SET isAvailable = 1 WHERE itemID = ?" 
+        updateParam = itemID
+        databaseConnector(database, updateReturnedQuery, updateParam, 1) 
+        #TODO if ()#over due case?
+        print(f"\nYou returned '{item[0]}`. Thank you!.")
+    else:
+        print("Item is not available for borrowing")
 
