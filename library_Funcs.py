@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, timedelta 
 
 database = 'library.db'
 
@@ -63,26 +64,34 @@ def browseItems():
     userID = int(input("\nTo borrow an item, please enter your userID or if you do not have one, enter 1: "))
     if (userID != 1):
         itemID = int(input("\nEnter the item ID to borrow or press Enter to go back:"))
-        # if itemID:
-            #borrowItems
+        if itemID:
+            borrowItem(itemID, userID)
     # else:
-    #     #add user Func here
-    #     itemID = int(input("\nEnter the item ID to borrow or press Enter to go back:"))
-    #     if itemID:
-    #         #borrowItems
-    #         break
-
-
-
+        #add user Func here
+        # newUserID = 
+        # itemID = int(input("\nEnter the item ID to borrow or press Enter to go back:"))
+        # if itemID:
+        #     # borrowItem(itemID, newUserID)
+        #     break
     
 
 #add ID systematically
 # def addUser(firstName, lastName, phoneNum):
     
 def borrowItem(itemID, userID):
-    # query = "SELECT itemID, title, genre FROM item WHERE isAvailable = 1
-    # databaseConnector(database, query, params, isWrite)
-    
+    query = "SELECT title FROM item WHERE isAvailable = 1 AND itemID = ?"
+    params = itemID
+    item = databaseConnector(database, query, params, 0)
+    if item:
+        borrowDate = datetime.today().strftime('%Y-%m-%d')
+        dueDate = (datetime.today() + timedelta(days=14)).strftime('%Y-%m-%d')
+        insertQuery = "INSERT INTO borrowedBy (itemID, userID, borrowDate, dueDate, returnDate) VALUES (?, ?, ?, ?, NULL)"
+        insertParams = [itemID,userID,borrowDate, dueDate, "NULL"]
+        databaseConnector(database, insertQuery, insertParams, 1)
+        print(f"\nYou borrowed '{item[0]}`. Please return it by {dueDate}.")
+    else:
+        print("Item is not available for borrowing")
+
 # def returnItem(itemID, userID):
     
 
