@@ -1,3 +1,4 @@
+import library_Funcs as A
 #main menu
 def main_menu():
     menu = """\nWelcome to the library!
@@ -35,6 +36,10 @@ while (userInput != 0):
     elif (userInput == 5): # Apply for volunteering
         continue
     elif (userInput == 6): #Help
+        # fname = input("fname?")
+        # lname = input("lname?")
+        # phonenum = input("phone?")
+        # A.addUser(fname, lname, phonenum)
         continue
     elif (userInput == 0): #Exit program
         break
