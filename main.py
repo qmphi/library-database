@@ -1,3 +1,5 @@
+import library_Funcs as Funcs
+
 #main menu
 def main_menu():
     menu = """\nWelcome to the library!
@@ -20,6 +22,7 @@ while (userInput != 0):
     main_menu()
     userInput = int(input("I want to navigate to: "))
     if (userInput == 1): #Browse items
+        Funcs.browseItems()
         #--> can search by different filters (id, genre, type etc)
             #-->prompt user if they want to borrow, ask for userID. 
                 #--> If no userID, prompt new user?
