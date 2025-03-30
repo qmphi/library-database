@@ -101,7 +101,6 @@ def browseItems():
                     if newUserID == None:
                         print("User creation failed, please try again.")
                         break
-                    print(newUserID)
                     borrowItem(itemID, newUserID)
             else:
                 print("This itemID is not valid or the item is not available")
@@ -109,6 +108,8 @@ def browseItems():
 
 def addUser(firstName, lastName, phoneNum):
     with sqlite3.connect(database) as conn:
+        if firstName == "" or lastName == "" or phoneNum == 0:
+            return None
         cursor = conn.cursor()
         insertStatement = """
             INSERT INTO patron (firstName, lastName, phoneNum)
@@ -181,6 +182,7 @@ def returnItem(itemID, userID):
     else:
         print("You have not borrowed this item")
 
+
 def manageLoans(userID):
     query = "SELECT userID FROM patron WHERE userID = ?"
     params = (userID,)
@@ -202,7 +204,7 @@ def manageLoans(userID):
                 print(f"{item[0]}. {item[1]} by {item[2]} {item[3]} borrowed: {item[4]} due: {item[5]})")
                     
             returnItemID = input("\nIf you would like to return a loan, please enter the itemID (press enter to skip): ")
-             #check if user exists
+             #check if item exists
             if (returnItemID == ""):
                 return 
             else:
@@ -340,7 +342,9 @@ def viewEvents():
                                 lname = input("Enter your last name: ").strip()
                                 phoneNum = input("Enter your phone number: ").strip()
                                 userID = addUser(fname, lname, phoneNum)
-                                break
+                                if userID != None:
+                                    break
+                                print("User creation failed. Please try again.")
                             elif user_input == "0":
                                 return None
                             else:
@@ -390,7 +394,9 @@ def applyVolunteer():
                 lname = input("Enter your last name: ").strip()
                 phoneNum = input("Enter your phone number: ").strip()
                 userID = addUser(fname, lname, phoneNum)
-                break
+                if userID != None:
+                    break
+                print("User creation failed. Please try again.")
             if user_input == "0":
                 print("Returning to Main Menu.\n")
                 return None    
@@ -453,7 +459,9 @@ def askLibrarian():
                 lname = input("Enter your last name: ").strip()
                 phoneNum = input("Enter your phone number: ").strip()
                 userID = addUser(fname, lname, phoneNum)
-                break
+                if userID != None:
+                    break
+                print("User creation failed. Please try again.")
             else:
                 try:
                     userID = int(user_input)
