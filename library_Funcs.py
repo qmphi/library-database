@@ -62,7 +62,7 @@ def browseItems():
 
     while True:
         #borrow input
-        itemID = input("\nEnter the item ID to of the item you want to borrow:")
+        itemID = input("\nEnter the item ID to of the item you want to borrow (or Press Enter to go back):")
         if (itemID == ""):
             print("No items selected for borrowing")
             return 
@@ -81,10 +81,21 @@ def browseItems():
                 if (checkUserID):# has a userID
                     borrowItem(itemID, userID)
                 else: #need to add new user
-                    print("UserID does not exist, please create a new one")
-                    firstName = input("\nPlease enter your first name: ")
-                    lastName = input("\nPlease enter your last name: ")
-                    phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
+                    print("UserID does not exist, let's create a new one.")
+                    firstName = input("\nPlease enter your first name: ").strip()
+                    lastName = input("\nPlease enter your last name: ").strip()
+                    phoneNum = input("\nPlease enter your phone number (no spaces): ").strip()
+                    while True:
+                        try:
+                            phoneNum = input("\nPlease enter your phone number (no spaces): ").strip()
+                            # Check if the input is numeric and exactly 10 digits long
+                            if phoneNum.isdigit():
+                                phoneNum = int(phoneNum) 
+                                break  
+                            else:
+                                print("Invalid phone number. It should only contain 10 digits without spaces.")
+                        except ValueError:
+                            print("Please enter a valid phone number (digits only, no spaces).")
                     newUserID = addUser(firstName, lastName, phoneNum)
                     
                     if newUserID == None or newUserID == 0:
@@ -95,7 +106,6 @@ def browseItems():
             else:
                 print("This itemID is not valid or the item is not available")
 
-#add ID systematically
 
 def addUser(firstName, lastName, phoneNum):
     with sqlite3.connect(database) as conn:
@@ -209,9 +219,20 @@ def manageLoans(userID):
                     print("\nInvalid itemID, please try again")
     else:
         print("\nYou currently do not have an existing userID, please create a new one")
-        firstName = input("\nPlease enter your first name: ").split()
-        lastName = input("Please enter your last name: ").split()
-        phoneNum = int(input("Please enter your phone number (no spaces): "))
+        firstName = input("\nPlease enter your first name: ").strip()
+        lastName = input("\nPlease enter your last name: ").strip()
+        phoneNum = input("\nPlease enter your phone number (no spaces): ").strip()
+        while True:
+            try:
+                phoneNum = input("\nPlease enter your phone number (no spaces): ").strip()
+                # Check if the input is numeric and exactly 10 digits long
+                if phoneNum.isdigit():
+                    phoneNum = int(phoneNum) 
+                    break  
+                else:
+                    print("Invalid phone number. It should only contain 10 digits without spaces.")
+            except ValueError:
+                print("Please enter a valid phone number (digits only, no spaces).")
         addUser(firstName, lastName, phoneNum)
         #kick them back to main menu because can't borrow without an id and they just made one
 
