@@ -25,7 +25,6 @@ while (userInput != 0):
     elif (userInput == 2): #Manage loans (return and item info/fines)
         userID = int(input("Please enter your userID to continue:" ))
         A.manageLoans(userID)
-        continue
     elif (userInput == 3): #View library events
         #View events --> can filter by audience, type, time, etc
         # register for event
