@@ -151,11 +151,10 @@ def borrowItem(itemID, userID):
 
         
 def returnItem(itemID, userID):
-    query = "SELECT i.title, b.dueDate FROM item AS i JOIN borrowedBy AS b ON i.itemID = b.itemID WHERE i.isAvailable = 0 AND b.itemID = ? AND b.userID = ?"
+    query = "SELECT i.title, b.dueDate, i.author FROM item AS i JOIN borrowedBy AS b ON i.itemID = b.itemID WHERE i.isAvailable = 0 AND b.itemID = ? AND b.userID = ?"
     params = [itemID, userID]
     item = databaseConnector(database, query, params, 0)
     if item:
-        print(item)
         #check overdue days and calc fine amnt
         dueDate = item[0][1]
         dueDateObj = datetime.strptime(dueDate, '%Y-%m-%d')
@@ -178,7 +177,7 @@ def returnItem(itemID, userID):
         updateReturnedQuery = "UPDATE item SET isAvailable = 1 WHERE itemID = ?" 
         updateParam = [itemID]
         databaseConnector(database, updateReturnedQuery, updateParam, 1) 
-        print(f"\nYou have returned {item[0][0]}. Thank you!.")
+        print(f"\nYou have returned {item[0][0]} by {item[0][2]}. Thank you!.")
     else:
         print("You have not borrowed this item")
 
@@ -214,7 +213,7 @@ def manageLoans(userID):
                     checkItemParam = [returnItemIDNum]
                     checkItemID = databaseConnector(database, checkItemQuery, checkItemParam, 0)
                     if checkItemID:
-                        returnItem(checkItemParam, userID)
+                        returnItem(returnItemIDNum, userID)
                 else:
                     print("\nInvalid itemID, please try again")
     else:
