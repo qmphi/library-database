@@ -27,6 +27,8 @@ while (userInput != 0):
                 #--> If no userID, prompt new user?
         continue
     elif (userInput == 2): #Manage loans (return and item info/fines)
+        userID = int(input("Please enter your userID to continue:" ))
+        A.manageLoans(userID)
         continue
     elif (userInput == 3): #View library events
         A.viewEvents()
