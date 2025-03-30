@@ -234,6 +234,55 @@ def manageLoans(userID):
         addUser(firstName, lastName, phoneNum)
         #kick them back to main menu because can't borrow without an id and they just made one
 
+def donateItem(userID):
+    query = "SELECT userID FROM patron WHERE userID = ?"
+    params = (userID,)
+    patron = databaseConnector(database, query, params, 0)
+
+    if patron:
+
+        print("Please provide the following information for the donated item")
+        title = input("Enter the item's full title: ")
+        author = input("Enter the author's full name: ")
+        publicationYear = input("Enter its publication year: ")
+        itemType =input("Enter the item type: ").strip()
+        genre = input("Enter its genre: ").strip()
+
+        insertQuery = """INSERT INTO item (title, author, publicationYear, itemType, genre, isAvailable) 
+                         VALUES (?, ?, ?, ?, ?, 1)"""
+        insertParams = (title, author, publicationYear, itemType, genre)
+        databaseConnector(database, insertQuery, insertParams, 1) #write doesn't return anything
+
+        # Retrieve the itemID of the last inserted item
+        getItemIDQuery = "SELECT itemID FROM item ORDER BY itemID DESC LIMIT 1"
+        itemID = databaseConnector(database, getItemIDQuery, (), 0)[0][0]
+
+        donationDate = datetime.today().strftime('%Y-%m-%d')
+        donationQuery = "INSERT INTO donations (userID, itemID, donationDate) VALUES (?, ?, ?)"
+        donationParams = (userID, itemID, donationDate)
+        databaseConnector(database, donationQuery, donationParams, 1)
+        print(f"\nThank you for your donation! The item: {itemID}. {title} by {author} has been added to the library.")
+
+
+    else:
+        print("\nYou currently do not have an existing userID, please create a new one")
+        firstName = input("\nPlease enter your first name: ").strip()
+        lastName = input("\nPlease enter your last name: ").strip()
+        phoneNum = input("\nPlease enter your phone number (no spaces): ").strip()
+        
+        while True:
+            try:
+                phoneNum = input("\nPlease enter your phone number (no spaces): ").strip()
+                # Check if the input is numeric and exactly 10 digits long
+                if phoneNum.isdigit():
+                    phoneNum = int(phoneNum) 
+                    break  
+                else:
+                    print("Invalid phone number. It should only contain 10 digits without spaces.")
+            except ValueError:
+                print("Please enter a valid phone number (digits only, no spaces).")
+        addUser(firstName, lastName, phoneNum)
+
 def viewEvents():
     with sqlite3.connect(database) as conn:
         cursor = conn.cursor()
