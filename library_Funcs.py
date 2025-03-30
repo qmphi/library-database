@@ -48,6 +48,7 @@ def browseItems():
     if genre_filter:
         query += "AND genre LIKE ?"
         params.append(f"%{genre_filter}%")
+
     # print("Generated Query: ", query)
     # print("Query Parameters: ", params)
     returnedItems = databaseConnector(database, query, params, 0) #it's a reading operation
@@ -59,24 +60,40 @@ def browseItems():
     for item in returnedItems:
          print(f"{item[0]}. {item[1]} by {item[2]} (Genre: {item[3]})") 
 
-    #borrow input
-    itemID = int(input("\nEnter the item ID to of the item you want to borrow:"))
-    query = "SELECT title FROM item WHERE isAvailable = 1 AND itemID = ?"
-    params = [itemID]
-    checkItemID = databaseConnector(database, query, params, 0)
+    while True:
+        #borrow input
+        itemID = input("\nEnter the item ID to of the item you want to borrow:")
+        if (itemID == ""):
+            print("No items selected for borrowing")
+            return 
+        else:
+            query = "SELECT title FROM item WHERE isAvailable = 1 AND itemID = ?"
+            params = [int(itemID)]
+            checkItemID = databaseConnector(database, query, params, 0)
 
-    if checkItemID:
-        userID = int(input("\nTo borrow an item, please enter your userID or if you do not have one, enter 0: "))
-        if (userID != 0):# has a userID
-            borrowItem(itemID, userID)
-        else: #need to add new user
-            firstName = input("\nPlease enter your first name: ").split()
-            lastName = input("\nPlease enter your last name: ").split()
-            phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
-            newUserID = addUser(firstName, lastName, phoneNum)
-            borrowItem(itemID, newUserID)
-    else:
-        print("This itemID is not valid or the item is not available")
+            if checkItemID:
+                userID = int(input("\nTo borrow an item, please enter your userID or if you do not have one, enter 0: "))
+                
+                #check if user exists
+                checkUserQuery = "SELECT userID FROM patron WHERE userID = ?"
+                checkUserParam = [userID]
+                checkUserID = databaseConnector(database, checkUserQuery, checkUserParam, 0)
+                if (checkUserID):# has a userID
+                    borrowItem(itemID, userID)
+                else: #need to add new user
+                    print("UserID does not exist, please create a new one")
+                    firstName = input("\nPlease enter your first name: ")
+                    lastName = input("\nPlease enter your last name: ")
+                    phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
+                    newUserID = addUser(firstName, lastName, phoneNum)
+                    
+                    if newUserID == None:
+                        print("User creation failed, please try again.")
+                        break
+                    print(newUserID)
+                    borrowItem(itemID, newUserID)
+            else:
+                print("This itemID is not valid or the item is not available")
 
 #add ID systematically
 
@@ -117,29 +134,31 @@ def borrowItem(itemID, userID):
         updateParam = (itemID,)
         databaseConnector(database, updateQuery, updateParam, 1)
 
-        print(f"\nYou borrowed {item[0]}. Please return it by {dueDate}.")
+        print(f"\nYou borrowed {item[0][0]}. Please return it by {dueDate}.")
     else:
         print("Item is not available for borrowing")
 
         
 def returnItem(itemID, userID):
-    query = "SELECT title FROM item WHERE isAvailable = 0 AND itemID = ?"
-    params = [itemID]
+    query = "SELECT i.title, b.dueDate FROM item AS i JOIN borrowedBy AS b ON i.itemID = b.itemID WHERE i.isAvailable = 0 AND b.itemID = ? AND b.userID = ?"
+    params = [itemID, userID]
     item = databaseConnector(database, query, params, 0)
     if item:
+        print(item)
         #check overdue days and calc fine amnt
-        dueDate = item[1]
+        dueDate = item[0][1]
         dueDateObj = datetime.strptime(dueDate, '%Y-%m-%d')
+        
+        fineAmnt = 0.0
+
+        #update borrowedBy table
+        returnDate = datetime.today().strftime('%Y-%m-%d')
         returnDateObj = datetime.strptime(returnDate, '%Y-%m-%d')
         overdueDays = (returnDateObj - dueDateObj).days
-
-        fineAmnt = 0.0
         if overdueDays > 0:
             fineAmnt = overdueDays * 2.0 #random due date amnt of $2 per day
             print(f"This item is {overdueDays} days overdue. A fine of {fineAmnt:.2f} has been applied.")
 
-        #update borrowedBy table
-        returnDate = datetime.today().strftime('%Y-%m-%d')
         insertQuery = "UPDATE borrowedBy SET returnDate = ?, fineAmnt = ? WHERE itemID = ? AND userID = ?"
         insertParams = [returnDate, fineAmnt, itemID, userID]
         databaseConnector(database, insertQuery, insertParams, 1)
@@ -148,7 +167,7 @@ def returnItem(itemID, userID):
         updateReturnedQuery = "UPDATE item SET isAvailable = 1 WHERE itemID = ?" 
         updateParam = [itemID]
         databaseConnector(database, updateReturnedQuery, updateParam, 1) 
-        print(f"\nYou have returned {item[0]}. Thank you!.")
+        print(f"\nYou have returned {item[0][0]}. Thank you!.")
     else:
         print("You have not borrowed this item")
 
@@ -156,10 +175,9 @@ def manageLoans(userID):
     query = "SELECT userID FROM patron WHERE userID = ?"
     params = (userID,)
     patron = databaseConnector(database, query, params, 0)
-    navigationCtrl = -1
 
     if patron:
-        while navigationCtrl != 0:
+        while True:
             print("Here are your current loans")
             patronItemQuery = "SELECT i.itemID, i.title, i.author, i.itemType, b.borrowDate, b.dueDate FROM item AS i JOIN borrowedBy AS b ON b.itemID = i.itemID JOIN patron AS p ON p.userID = b.userID WHERE p.userID = ? AND i.isAvailable = 0" 
             itemParams = (userID,)
@@ -173,12 +191,20 @@ def manageLoans(userID):
             for item in items:
                 print(f"{item[0]}. {item[1]} by {item[2]} {item[3]} borrowed: {item[4]} due: {item[5]})")
                     
-            returnItemID = int(input("If you would like to return a loan, please enter the itemID (press enter to skip): "))
-            if returnItemID:
-                returnItem(returnItemID, userID)
-            
-            navigationCtrl = int(input("To exit Managing loans, press 0: "))
-
+            returnItemID = input("\nIf you would like to return a loan, please enter the itemID (press enter to skip): ")
+             #check if user exists
+            if (returnItemID == ""):
+                return 
+            else:
+                if returnItemID.isdigit():
+                    returnItemIDNum = int(returnItemID)
+                    checkItemQuery = "SELECT itemID FROM item WHERE itemID = ?"
+                    checkItemParam = [returnItemIDNum]
+                    checkItemID = databaseConnector(database, checkItemQuery, checkItemParam, 0)
+                    if checkItemID:
+                        returnItem(checkItemParam, userID)
+                else:
+                    print("\nInvalid itemID, please try again")
     else:
         print("\nYou currently do not have an existing userID, please create a new one")
         firstName = input("\nPlease enter your first name: ").split()
