@@ -98,7 +98,7 @@ def browseItems():
                             print("Please enter a valid phone number (digits only, no spaces).")
                     newUserID = addUser(firstName, lastName, phoneNum)
                     
-                    if newUserID == None or newUserID == 0:
+                    if newUserID == None:
                         print("User creation failed, please try again.")
                         break
                     print(newUserID)
@@ -110,7 +110,7 @@ def browseItems():
 def addUser(firstName, lastName, phoneNum):
     with sqlite3.connect(database) as conn:
         if firstName == "" or lastName == "" or phoneNum == 0:
-            return 0
+            return None
         cursor = conn.cursor()
         insertStatement = """
             INSERT INTO patron (firstName, lastName, phoneNum)
@@ -293,7 +293,7 @@ def viewEvents():
                                 lname = input("Enter your last name: ").strip()
                                 phoneNum = input("Enter your phone number: ").strip()
                                 userID = addUser(fname, lname, phoneNum)
-                                if userID != 0:
+                                if userID != None:
                                     break
                                 print("User creation failed. Please try again.")
                             elif user_input == "0":
@@ -345,7 +345,7 @@ def applyVolunteer():
                 lname = input("Enter your last name: ").strip()
                 phoneNum = input("Enter your phone number: ").strip()
                 userID = addUser(fname, lname, phoneNum)
-                if userID != 0:
+                if userID != None:
                     break
                 print("User creation failed. Please try again.")
             if user_input == "0":
@@ -410,7 +410,7 @@ def askLibrarian():
                 lname = input("Enter your last name: ").strip()
                 phoneNum = input("Enter your phone number: ").strip()
                 userID = addUser(fname, lname, phoneNum)
-                if userID != 0:
+                if userID != None:
                     break
                 print("User creation failed. Please try again.")
             else:
