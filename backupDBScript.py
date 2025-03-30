@@ -2,7 +2,7 @@ import sqlite3
 import shutil
 
 database = 'libraryClean.db'
-backup_file = 'libraryCleanBackup.db'
+backup_file = 'library.db'
 
 def backup_database():
     """Creates a backup copy of the database."""
