@@ -29,18 +29,15 @@ while (userInput != 0):
     elif (userInput == 2): #Manage loans (return and item info/fines)
         continue
     elif (userInput == 3): #View library events
-        #View events --> can filter by audience, type, time, etc
-        # register for event
+        A.viewEvents()
         continue
     elif (userInput == 4): #Donate an item
         continue
     elif (userInput == 5): # Apply for volunteering
+        A.applyVolunteer()
         continue
     elif (userInput == 6): #Help
-        # fname = input("fname?")
-        # lname = input("lname?")
-        # phonenum = input("phone?")
-        # A.addUser(fname, lname, phonenum)
+        A.askLibrarian()
         continue
     elif (userInput == 0): #Exit program
         break
