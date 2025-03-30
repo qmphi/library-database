@@ -87,7 +87,7 @@ def browseItems():
                     phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
                     newUserID = addUser(firstName, lastName, phoneNum)
                     
-                    if newUserID == None:
+                    if newUserID == None or newUserID == 0:
                         print("User creation failed, please try again.")
                         break
                     print(newUserID)
@@ -99,6 +99,8 @@ def browseItems():
 
 def addUser(firstName, lastName, phoneNum):
     with sqlite3.connect(database) as conn:
+        if firstName == "" or lastName == "" or phoneNum == 0:
+            return 0
         cursor = conn.cursor()
         insertStatement = """
             INSERT INTO patron (firstName, lastName, phoneNum)
@@ -270,7 +272,9 @@ def viewEvents():
                                 lname = input("Enter your last name: ").strip()
                                 phoneNum = input("Enter your phone number: ").strip()
                                 userID = addUser(fname, lname, phoneNum)
-                                break
+                                if userID != 0:
+                                    break
+                                print("User creation failed. Please try again.")
                             elif user_input == "0":
                                 return None
                             else:
@@ -320,7 +324,9 @@ def applyVolunteer():
                 lname = input("Enter your last name: ").strip()
                 phoneNum = input("Enter your phone number: ").strip()
                 userID = addUser(fname, lname, phoneNum)
-                break
+                if userID != 0:
+                    break
+                print("User creation failed. Please try again.")
             if user_input == "0":
                 print("Returning to Main Menu.\n")
                 return None    
@@ -383,7 +389,9 @@ def askLibrarian():
                 lname = input("Enter your last name: ").strip()
                 phoneNum = input("Enter your phone number: ").strip()
                 userID = addUser(fname, lname, phoneNum)
-                break
+                if userID != 0:
+                    break
+                print("User creation failed. Please try again.")
             else:
                 try:
                     userID = int(user_input)
