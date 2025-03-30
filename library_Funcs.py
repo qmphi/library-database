@@ -47,8 +47,8 @@ def browseItems():
     if genre_filter:
         query += "AND genre LIKE ?"
         params.append(f"%{genre_filter}%")
-    print("Generated Query: ", query)
-    print("Query Parameters: ", params)
+    # print("Generated Query: ", query)
+    # print("Query Parameters: ", params)
     returnedItems = databaseConnector(database, query, params, 0) #it's a reading operation
     if not returnedItems:
         print("No matches found")
@@ -59,20 +59,24 @@ def browseItems():
          print(f"{item[0]}. {item[1]} by {item[2]} (Genre: {item[3]})") 
 
     #borrow input
-    userID = int(input("\nTo borrow an item, please enter your userID or if you do not have one, enter 1: "))
-    if (userID != 1):
-        itemID = int(input("\nEnter the item ID to borrow or press Enter to go back:"))
-        if itemID:
+    itemID = int(input("\nEnter the item ID to of the item you want to borrow:"))
+    query = "SELECT title FROM item WHERE isAvailable = 1 AND itemID = ?"
+    params = (itemID,)
+    checkItemID = databaseConnector(database, query, params, 0)
+
+    if checkItemID:
+        userID = int(input("\nTo borrow an item, please enter your userID or if you do not have one, enter 0: "))
+        if (userID != 0):# has a userID
             borrowItem(itemID, userID)
-    else:
-        #add user Func here
-        firstName = input("\nPlease enter your first name: ").split()
-        lastName = input("\nPlease enter your last name: ").split()
-        phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
-        newUserID = addUser(firstName, lastName, phoneNum)
-        itemID = int(input("\nEnter the item ID to of the item you want to borrow:"))
-        if itemID:
+        else: #need to add new user
+            firstName = input("\nPlease enter your first name: ").split()
+            lastName = input("\nPlease enter your last name: ").split()
+            phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
+            newUserID = addUser(firstName, lastName, phoneNum)
             borrowItem(itemID, newUserID)
+    else:
+        print("This itemID is not valid or is not available")
+
 
 #add ID systematically
 
@@ -113,7 +117,7 @@ def borrowItem(itemID, userID):
         updateParam = (itemID,)
         databaseConnector(database, updateQuery, updateParam, 1)
 
-        print(f"\nYou borrowed '{item[0]}`. Please return it by {dueDate}.")
+        print(f"\nYou borrowed {item[0]}. Please return it by {dueDate}.")
     else:
         print("Item is not available for borrowing")
 
@@ -134,7 +138,38 @@ def returnItem(itemID, userID):
         updateParam = (itemID,)
         databaseConnector(database, updateReturnedQuery, updateParam, 1) 
         #TODO if ()#over due case?
-        print(f"\nYou returned '{item[0]}`. Thank you!.")
+        print(f"\nYou returned {item[0]}. Thank you!.")
     else:
         print("You have not borrowed this item")
 
+def manageLoans(userID):
+    query = "SELECT userID FROM patron WHERE userID = ?"
+    params = (userID,)
+    patron = databaseConnector(database, query, params, 0)
+
+    if patron:
+        print("Here are your current loans")
+        #!somethings not working here (something with userID)
+        patronItemQuery = "SELECT i.itemID, i.title, i.author, i.itemType, b.borrowDate, b.dueDate FROM item AS i JOIN borrowedBy AS b ON b.itemID = i.itemID JOIN patron AS p ON p.userID = b.userID WHERE userID = ? AND i.isAvailable = 0" 
+        itemParams = (userID,)
+
+        items = databaseConnector(database, patronItemQuery, itemParams, 0) #it's a reading operation
+        if not items:
+            print("No current loans")
+            return
+    
+        #display list
+        for item in items:
+            print(f"{item[0]}. {item[1]} by {item[2]} {item[3]} borrowed: {item[4]} due: {item[5]})")
+                  
+        returnItemID = int(input("If you would like to return a loan, please enter the itemID (press enter to go back): "))
+        if returnItemID:
+            returnItem(returnItemID, userID)
+
+    else:
+        firstName = input("\nPlease enter your first name: ").split()
+        lastName = input("\nPlease enter your last name: ").split()
+        phoneNum = int(input("\nPlease enter your phone number (no spaces): "))
+        addUser(firstName, lastName, phoneNum)
+
+    

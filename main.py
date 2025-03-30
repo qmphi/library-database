@@ -22,11 +22,9 @@ while (userInput != 0):
     userInput = int(input("I want to navigate to: "))
     if (userInput == 1): #Browse items
         A.browseItems()
-        #--> can search by different filters (id, genre, type etc)
-            #-->prompt user if they want to borrow, ask for userID. 
-                #--> If no userID, prompt new user?
-        continue
     elif (userInput == 2): #Manage loans (return and item info/fines)
+        userID = int(input("Please enter your userID to continue:" ))
+        A.manageLoans(userID)
         continue
     elif (userInput == 3): #View library events
         #View events --> can filter by audience, type, time, etc
