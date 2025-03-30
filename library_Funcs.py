@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 
 database = 'library.db'
 
-#reminder need to open and close db connection in each 
-#func for dealing with connections
-#isWrite is for any writing operations 0 if no, 1 if yes
+# #func for dealing with connections
+# isWrite is for any writing operations 0 if no, 1 if yes
 def databaseConnector(database, query, params, isWrite):
     try:
         with sqlite3.connect(database) as conn:
@@ -73,10 +72,28 @@ def browseItems():
         # if itemID:
         #     # borrowItem(itemID, newUserID)
         #     break
-    
 
 #add ID systematically
-# def addUser(firstName, lastName, phoneNum):
+
+def addUser(firstName, lastName, phoneNum):
+    with sqlite3.connect(database) as conn:
+        cursor = conn.cursor()
+        insertStatement = """
+            INSERT INTO patron (firstName, lastName, phoneNum)
+            VALUES (?, ?, ?);
+        """
+        try:
+            cursor.execute(insertStatement, (firstName, lastName, phoneNum))
+            conn.commit()
+            userId = cursor.lastrowid
+            print("User created successfully!")
+            print("Your userID is: " + str(userId))
+            return None
+          
+        except sqlite3.Error as e:
+            print("Error:", e)
+            return None
+
     
 def borrowItem(itemID, userID):
     query = "SELECT title FROM item WHERE isAvailable = 1 AND itemID = ?"
@@ -99,6 +116,7 @@ def borrowItem(itemID, userID):
     else:
         print("Item is not available for borrowing")
 
+        
 def returnItem(itemID, userID):
     query = "SELECT title FROM item WHERE isAvailable = 0 AND itemID = ?"
     params = itemID

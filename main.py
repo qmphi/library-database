@@ -1,5 +1,4 @@
-import library_Funcs as Funcs
-
+import library_Funcs as A
 #main menu
 def main_menu():
     menu = """\nWelcome to the library!
@@ -22,7 +21,7 @@ while (userInput != 0):
     main_menu()
     userInput = int(input("I want to navigate to: "))
     if (userInput == 1): #Browse items
-        Funcs.browseItems()
+        A.borrowItem()
         #--> can search by different filters (id, genre, type etc)
             #-->prompt user if they want to borrow, ask for userID. 
                 #--> If no userID, prompt new user?
@@ -38,6 +37,10 @@ while (userInput != 0):
     elif (userInput == 5): # Apply for volunteering
         continue
     elif (userInput == 6): #Help
+        # fname = input("fname?")
+        # lname = input("lname?")
+        # phonenum = input("phone?")
+        # A.addUser(fname, lname, phonenum)
         continue
     elif (userInput == 0): #Exit program
         break
