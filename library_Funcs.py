@@ -200,7 +200,7 @@ def manageLoans(userID):
         
             #display list
             for item in items:
-                print(f"{item[0]}. {item[1]} by {item[2]} {item[3]} borrowed: {item[4]} due: {item[5]})")
+                print(f"{item[0]}. {item[1]} by {item[2]} ({item[3]})          borrowed: {item[4]} due: {item[5]})")
                     
             returnItemID = input("\nIf you would like to return a loan, please enter the itemID (press enter to skip): ")
              #check if item exists
@@ -236,6 +236,7 @@ def manageLoans(userID):
         #kick them back to main menu because can't borrow without an id and they just made one
 
 def donateItem(userID):
+    userID = int(userID)
     query = "SELECT userID FROM patron WHERE userID = ?"
     params = (userID,)
     patron = databaseConnector(database, query, params, 0)
@@ -248,6 +249,10 @@ def donateItem(userID):
         publicationYear = input("Enter its publication year: ")
         itemType =input("Enter the item type: ").strip()
         genre = input("Enter its genre: ").strip()
+
+        if title == "" or author == "" or publicationYear == "" or itemType == "" or genre == "":
+            print("Cannot leave a field blank, please retry.")
+            return
 
         insertQuery = """INSERT INTO item (title, author, publicationYear, itemType, genre, isAvailable) 
                          VALUES (?, ?, ?, ?, ?, 1)"""

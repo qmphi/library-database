@@ -34,8 +34,9 @@ while (userInput != 0):
         A.viewEvents()
         continue
     elif (userInput == 4): #Donate an item
-        userID = int(input("Please enter your userID to continue:" ))
-        A.donateItem(userID)
+        userID = input("Please enter your userID to continue or Press Enter to go back:" )
+        if userID != "":
+            A.donateItem(userID)
         continue
     elif (userInput == 5): # Apply for volunteering
         A.applyVolunteer()
